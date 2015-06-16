@@ -1,0 +1,286 @@
+﻿<controls:MetroWindow x:Class="AttendanceSystem.Views.MainView"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:cal="http://www.caliburnproject.org"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      Title="Attendance System"
+                      GlowBrush="{DynamicResource AccentColorBrush}"
+                      Icon="../Images/Logo.png"
+                      NonActiveGlowBrush="Red"
+                      ShowIconOnTitleBar="True"
+                      ShowTitleBar="True"
+                      WindowStartupLocation="CenterScreen"
+                      d:DesignHeight="300"
+                      d:DesignWidth="1700"
+                      mc:Ignorable="d">
+    <controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <Style x:Key="AppThemeMenuItemStyle"
+                   BasedOn="{StaticResource MetroMenuItem}"
+                   TargetType="{x:Type MenuItem}">
+                <Setter Property="Command" Value="{Binding ChangeAccentCommand}" />
+                <Setter Property="Icon" Value="{StaticResource AppThemeMenuIcon}" />
+                <Setter Property="Header" Value="{Binding Name, Mode=OneWay}" />
+            </Style>
+
+            <Style x:Key="AccentColorMenuItemStyle"
+                   BasedOn="{StaticResource MetroMenuItem}"
+                   TargetType="{x:Type MenuItem}">
+                <Setter Property="Command" Value="{Binding ChangeAccentCommand}" />
+                <Setter Property="Icon" Value="{StaticResource AccentMenuIcon}" />
+                <Setter Property="Header" Value="{Binding Name, Mode=OneWay}" />
+            </Style>
+        </ResourceDictionary>
+    </controls:MetroWindow.Resources>
+
+    <controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            <Button Content="Theme" />
+            <Button Content="Accent" />
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>
+
+    <controls:MetroContentControl>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <controls:MetroAnimatedSingleRowTabControl x:Name="MainTabControl"
+                                                       Grid.Row="1"
+                                                       controls:TabControlHelper.IsUnderlined="True">
+                <TabItem Width="170" Header="Attendance">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Margin="0,5"
+                                    HorizontalAlignment="Left"
+                                    Orientation="Horizontal">
+                            <Button Width="35"
+                                    Height="35"
+                                    Margin="10,0,0,0"
+                                    ToolTip="Import Excel"
+                                    cal:Message.Attach="[Event Click] = [Action ImportExcel]">
+                                <Path Width="25"
+                                      Height="25"
+                                      Margin="0,0,0,0"
+                                      Data="M13.989575,11.708L24.740842,11.708 31.96085,22.437387 39.126062,11.708 49.726231,11.708 37.291483,30.360723 51.846001,51.989998 40.943838,51.989998 31.891752,38.461063 27.617006,44.871376 33.068838,44.871376 33.068838,52.292 12.021,52.292 26.570218,30.507824z M18.815,2.6497202C9.9008799,2.6497202,2.6497297,9.9022802,2.6497297,18.8151L2.6497297,61.3503 61.2173,61.3503 61.2173,2.6497202z M18.815,0L20.5377,0 44.7864,0 63.867001,0 63.867001,64 47.437401,64 20.5377,64 0,64 0,44.7864 0,36.5716 0,18.8151C0,8.4244401,8.4243898,0,18.815,0z"
+                                      Fill="Black"
+                                      RenderTransformOrigin="0.5,0.5"
+                                      Stretch="Uniform" />
+                            </Button>
+                            <Button Width="35"
+                                    Height="35"
+                                    Margin="10,0,0,0"
+                                    ToolTip="Export to Excel"
+                                    cal:Message.Attach="[Event Click] = [Action ExportToExcel]">
+                                <Path Width="25"
+                                      Height="25"
+                                      Data="M33.374784,10.822461C33.596149,10.830255,33.843211,10.936929,34.102826,11.152984L36.000681,12.738375C36.921856,13.509172,38.430317,14.769566,39.350193,15.537862L41.249844,17.124953C42.172918,17.89515,42.159222,19.141944,41.225143,19.89384L39.298695,21.444034C38.362417,22.200429,36.83276,23.431623,35.897182,24.183419L33.971433,25.734313C33.037157,26.490209,32.282576,25.858711,32.295774,24.334518L32.322373,21.406833 21.151462,21.406833C20.364882,21.406833,19.726999,20.767536,19.726999,19.981039L19.726999,16.893855C19.726999,16.108059,20.364882,15.469362,21.151462,15.469362L32.375774,15.469362 32.40047,12.524778C32.41118,11.428401,32.809072,10.802544,33.374784,10.822461z M9.3348141,0L14.90645,8.4499774 20.502906,0.16809082 28.336986,0.16809082 18.949391,14.225346C18.177183,14.864048,17.673978,15.816451,17.673978,16.894054L17.673978,19.981265C17.673978,21.899371,19.233794,23.457876,21.151313,23.457876L24.80295,23.457876 29.671,30.839 21.586918,30.839 14.745548,20.521067 11.586017,25.254082 15.502156,25.170781 15.586057,30.506 0,30.506 10.784509,14.549147 1.2487926,0.16809082z"
+                                      Fill="Black"
+                                      RenderTransformOrigin="0.5,0.5"
+                                      Stretch="Uniform" />
+                            </Button>
+                            <Button Width="35"
+                                    Height="35"
+                                    Margin="10,0,0,0"
+                                    ToolTip="Open Setting Window"
+                                    cal:Message.Attach="[Event Click] = [Action OpenSettingWindow]">
+                                <Path Width="25"
+                                      Height="25"
+                                      Margin="0,0,0,0"
+                                      Data="M860.115,417.777C856.507,419.008 854.822,414.544 857.016,412.44 855.582,410.967 854.599,410.495 852.713,410.202 852.434,411.376 851.772,412.381 850.646,412.612 848.58,413.035 847.333,411.535 846.686,410.03 843.596,411.048 842.383,412.784 842.383,412.784 842.383,412.784 843.009,413.367 843.07,413.472 844.382,415.751 842.474,418.591 839.284,417.777 839.039,419.387 839.039,421.504 839.284,423.113 842.763,421.818 844.714,426.328 842.383,428.278 843.779,429.751 844.586,430.276 846.858,430.689 847.248,427.475 852.488,427.46 852.884,430.689 855.38,430.195 857.016,428.107 857.016,428.107 857.016,428.107 856.083,427.138 855.983,426.557 855.517,423.831 857.501,422.762 860.115,423.113 860.567,421.492 860.511,419.419 860.115,417.777z M849.766,424.579C847.436,424.579 845.546,422.69 845.546,420.359 845.546,418.028 847.436,416.139 849.766,416.139 852.098,416.139 853.987,418.028 853.987,420.359 853.987,422.69 852.098,424.579 849.766,424.579z"
+                                      Fill="Black"
+                                      RenderTransformOrigin="0.5,0.5"
+                                      Stretch="Uniform" />
+                            </Button>
+                            <Button Width="35"
+                                    Height="35"
+                                    Margin="10,0,0,0"
+                                    ToolTip="Open New Personnel List Window"
+                                    cal:Message.Attach="[Event Click] = [Action OpenNewPersonnelWindow]">
+                                <Path Width="25"
+                                      Height="25"
+                                      Margin="0,0,0,0"
+                                      Data="M37.228001,21.281L41.202,21.281 41.202,29.02 37.228001,29.02z M34.508999,4.3920002L34.508999,46.222 59.188999,46.222 59.188999,4.3920002z M3.974,4.3920002L3.974,46.222 28.653,46.222 28.653,4.3920002z M0,0L64,0 64,51.033001 0,51.033001z"
+                                      Fill="Black"
+                                      RenderTransformOrigin="0.5,0.5"
+                                      Stretch="Uniform" />
+                            </Button>
+                        </StackPanel>
+
+                        <DataGrid x:Name="AttendanceDataGrid"
+                                  Grid.Row="1"
+                                  Margin="5"
+                                  AutoGenerateColumns="False"
+                                  ItemsSource="{Binding AttendanceCollection}"
+                                  RenderOptions.ClearTypeHint="Enabled"
+                                  SelectionUnit="FullRow"
+                                  TextOptions.TextFormattingMode="Display">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Index}" Header="序号" />
+                                <DataGridTextColumn Binding="{Binding DepartmentId}" Header="部门" />
+                                <!--<DataGridComboBoxColumn Header="部门">
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding DepartmentCollection}" />
+                                            <Setter Property="DisplayMemberPath" Value="{Binding DepartmentId}" />
+                                            <Setter Property="SelectedValuePath" Value="{Binding DepartmentName}" />
+                                            <Setter Property="SelectedIndex" Value="{Binding DepartmentId}" />
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
+                                    <DataGridComboBoxColumn.ElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding DepartmentCollection}" />
+                                            <Setter Property="DisplayMemberPath" Value="{Binding DepartmentId}" />
+                                            <Setter Property="SelectedValuePath" Value="{Binding DepartmentName}" />
+                                            <Setter Property="SelectedIndex" Value="{Binding DepartmentId}" />
+                                        </Style>
+                                    </DataGridComboBoxColumn.ElementStyle>
+                                </DataGridComboBoxColumn>-->
+                                <DataGridTextColumn Binding="{Binding PersonnelName}" Header="姓名" />
+                                <DataGridTextColumn Binding="{Binding SickLeave}" Header="病假（天）" />
+                                <DataGridTextColumn Binding="{Binding CumulativeSickLeave}" Header="累计病假" />
+                                <DataGridTextColumn Binding="{Binding PrivateLeave}" Header="事假（天）" />
+                                <DataGridTextColumn Binding="{Binding CumulativePrivateLeave}" Header="累计事假" />
+                                <DataGridTextColumn Binding="{Binding TransformLeave}" Header="病事假转换" />
+                                <DataGridTextColumn Binding="{Binding FreeAnnualLeave}" Header="可休年假" />
+                                <DataGridTextColumn Binding="{Binding UsedAnnualLeave}" Header="已休年假" />
+                                <DataGridTextColumn Binding="{Binding RemainingAnnualLeave}" Header="剩余年假" />
+                                <DataGridTextColumn Binding="{Binding OtherLeaveTypeId}" Header="其他假别" />
+                                <!--<DataGridComboBoxColumn Header="其他假别">
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding LeaveCollection}" />
+                                            <Setter Property="DisplayMemberPath" Value="{Binding LeaveId}" />
+                                            <Setter Property="SelectedValuePath" Value="{Binding LeaveName}" />
+                                            <Setter Property="SelectedIndex" Value="{Binding LeaveId}" />
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
+                                    <DataGridComboBoxColumn.ElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding OtherLeaveCollection}" />
+                                            <Setter Property="DisplayMemberPath" Value="{Binding LeaveId}" />
+                                            <Setter Property="SelectedValuePath" Value="{Binding LeaveName}" />
+                                            <Setter Property="SelectedIndex" Value="{Binding OtherLeaveTypeId}" />
+                                        </Style>
+                                    </DataGridComboBoxColumn.ElementStyle>
+                                </DataGridComboBoxColumn>-->
+                                <DataGridTextColumn Binding="{Binding LateTime}" Header="迟到（次）" />
+                                <DataGridTextColumn Binding="{Binding Absenteeism}" Header="旷工（天）" />
+                                <DataGridTextColumn Binding="{Binding AttendanceHour}" Header="本月出勤工时（小时）" />
+                                <DataGridTextColumn Binding="{Binding OvertimeHour}" Header="本月加班(小时）" />
+                                <DataGridTextColumn Binding="{Binding Note}" Header="备注" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Width="170" Header="Search" />
+
+                <TabItem Width="170" Header="Other" />
+            </controls:MetroAnimatedSingleRowTabControl>
+
+            <StatusBar Grid.Row="2">
+                <StatusBarItem>Attendance System Application</StatusBarItem>
+                <Separator Style="{StaticResource MetroStatusBarSeparator}" />
+                <StatusBarItem Content="{Binding StatusString}" />
+            </StatusBar>
+        </Grid>
+    </controls:MetroContentControl>
+
+    <controls:MetroWindow.Flyouts>
+        <controls:FlyoutsControl>
+            <controls:Flyout Width="{Binding RelativeSource={RelativeSource FindAncestor,
+                                                                            AncestorType=controls:MetroWindow},
+                                             Path=ActualWidth}"
+                             Height="250"
+                             Position="Top"
+                             Theme="Accent">
+                <Grid Margin="0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Width="60"
+                               VerticalAlignment="Center"
+                               Text="考勤时长：" />
+                    <controls:NumericUpDown Grid.Row="0"
+                                            Grid.Column="1"
+                                            Width="100"
+                                            VerticalAlignment="Center"
+                                            Value="{Binding NormalWorkHours,
+                                                            Mode=TwoWay}" />
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Width="60"
+                               VerticalAlignment="Center"
+                               Text="考勤时间：" />
+                    <DatePickerTextBox x:Name="test"
+                                       Grid.Row="1"
+                                       Grid.Column="1"
+                                       Width="100"
+                                       VerticalAlignment="Center"
+                                       Background="White"
+                                       Text="{Binding StartWorkTime,
+                                                      Mode=TwoWay}" />
+                </Grid>
+            </controls:Flyout>
+
+            <controls:Flyout Width="{Binding RelativeSource={RelativeSource FindAncestor,
+                                                                            AncestorType=controls:MetroWindow},
+                                             Path=ActualWidth}"
+                             Height="250"
+                             Position="Bottom"
+                             Theme="Accent">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Button Width="35"
+                            Height="35"
+                            Margin="5"
+                            HorizontalAlignment="Left"
+                            cal:Message.Attach="[Event Click] = [Action AddNewPersonnelAndAttendanceToDataBase]">
+                        <Path Width="25"
+                              Height="25"
+                              Margin="0,0,0,0"
+                              Data="M19.833,0L32.5,0 32.5,19.833999 52.334,19.833999 52.334,32.500999 32.5,32.500999 32.5,52.333 19.833,52.333 19.833,32.500999 0,32.500999 0,19.833999 19.833,19.833999z"
+                              Fill="Black"
+                              RenderTransformOrigin="0.5,0.5"
+                              Stretch="Uniform" />
+                    </Button>
+                    <DataGrid x:Name="MetroDataGrid"
+                              Grid.Row="1"
+                              Margin="5"
+                              AutoGenerateColumns="False"
+                              ItemsSource="{Binding NewPersonnelCollection}"
+                              RenderOptions.ClearTypeHint="Enabled"
+                              SelectionUnit="FullRow"
+                              TextOptions.TextFormattingMode="Display">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding PersonnelName}" Header="姓名" />
+                            <DataGridTextColumn Binding="{Binding DepartmentId}" Header="部门" />
+                            <DataGridTextColumn Binding="{Binding FreeAnnualLeave}" Header="可休年假" />
+                            <DataGridTextColumn Binding="{Binding UsedAnnualLeave}" Header="已休年假" />
+                            <DataGridTextColumn Binding="{Binding RemainingAnnualLeave}" Header="剩余年假" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+            </controls:Flyout>
+        </controls:FlyoutsControl>
+    </controls:MetroWindow.Flyouts>
+</controls:MetroWindow>
