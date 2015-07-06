@@ -7,8 +7,6 @@ using AttendanceSystem.Views;
 
 using Caliburn.Micro;
 
-using MahApps.Metro.Controls.Dialogs;
-
 namespace AttendanceSystem
 {
 

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ConfigInfo>
+  <DefaultWorkHours Value="186" />
+  <StartWorkTime Value="10:00" />
+  <DefaultStartWorkTime Value="9:30" />
+  <DefaultEndWorkTime Value="18:30" />
+</ConfigInfo>

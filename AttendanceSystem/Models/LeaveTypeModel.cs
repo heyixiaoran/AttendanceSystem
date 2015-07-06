@@ -2,7 +2,7 @@
 {
     public class LeaveTypeModel
     {
-        public int LeaveId { get; set; }
+        public string LeaveId { get; set; }
         public string LeaveName { get; set; }
     }
 }

@@ -194,7 +194,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="AttendanceSystemEntity" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="AttendanceSystemEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Attendances" EntityType="Self.Attendance" />
           <EntitySet Name="Departments" EntityType="Self.Department" />
           <EntitySet Name="LeaveTypes" EntityType="Self.LeaveType" />
@@ -217,7 +217,7 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="AttendanceSystemModelStoreContainer" CdmEntityContainer="AttendanceSystemEntity">
+        <EntityContainerMapping StorageEntityContainer="AttendanceSystemModelStoreContainer" CdmEntityContainer="AttendanceSystemEntities">
           <EntitySetMapping Name="Attendances">
             <EntityTypeMapping TypeName="AttendanceSystemModel.Attendance">
               <MappingFragment StoreEntitySet="Attendance">

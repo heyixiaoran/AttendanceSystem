@@ -5,11 +5,13 @@ namespace AttendanceSystem.Models
     [ImplementPropertyChanged]
     public class PersonnnelModel
     {
-        public int PersonnelId { get; set; }
+        public int PersonnelIndex { get; set; }
         public string PersonnelName { get; set; }
-        public int DepartmentId { get; set; }
-        public float FreeAnnualLeave { get; set; }
-        public float UsedAnnualLeave { get; set; }
-        public float RemainingAnnualLeave { get; set; }
+        public string DepartmentName { get; set; }
+        public double? FreeAnnualLeave { get; set; }
+        public double? UsedAnnualLeave { get; set; }
+        public double? RemainingAnnualLeave { get; set; }
+        public double? CumulativeSickLeave { get; set; }
+        public double? CumulativePrivateLeave { get; set; }
     }
 }
