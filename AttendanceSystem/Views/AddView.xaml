@@ -78,25 +78,6 @@
                       TextOptions.TextFormattingMode="Display"
                       cal:Message.Attach="[Event CellEditEnding] = [Action OnDataGridCellEditEnding($source,$eventArgs)]">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="100" Header="姓名">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding PersonnelName}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <ComboBox Width="{Binding RelativeSource={RelativeSource FindAncestor,
-                                                                                         AncestorType=DataGridTemplateColumn},
-                                                          Path=Width}"
-                                          DisplayMemberPath="PersonnelName"
-                                          ItemsSource="{Binding DataContext.AttendanceCollection,
-                                                                ElementName=AddDataGrid}"
-                                          SelectedValue="{Binding PersonnelName}"
-                                          SelectedValuePath="PersonnelName" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
                     <DataGridComboBoxColumn Width="100" Header="姓名">
                         <DataGridComboBoxColumn.EditingElementStyle>
                             <Style TargetType="{x:Type ComboBox}">
@@ -104,6 +85,8 @@
                                 <Setter Property="SelectedValuePath" Value="PersonnelName" />
                                 <Setter Property="DisplayMemberPath" Value="PersonnelName" />
                                 <Setter Property="SelectedValue" Value="{Binding PersonnelName}" />
+                                <Setter Property="IsEditable" Value="True" />
+                                <Setter Property="IsTextSearchEnabled" Value="True"/>
                             </Style>
                         </DataGridComboBoxColumn.EditingElementStyle>
                         <DataGridComboBoxColumn.ElementStyle>
