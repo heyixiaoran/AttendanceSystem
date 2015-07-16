@@ -27,12 +27,13 @@ namespace AttendanceSystem
             container.Singleton<IWindowManager, WindowManager>();
             container.Singleton<IEventAggregator, EventAggregator>();
             container.PerRequest<IShell, MainViewModel>();
+            container.PerRequest<AddViewModel>();
         }
 
         protected override object GetInstance(Type service, string key)
         {
             var instance = container.GetInstance(service, key);
-            if (instance != null)
+            if(instance != null)
             {
                 return instance;
             }

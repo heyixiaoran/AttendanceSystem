@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Xml;
 
 using AttendanceSystem.Models;
@@ -20,13 +21,13 @@ using NPOI.XSSF.UserModel;
 
 namespace AttendanceSystem.ViewModels
 {
-    public class MainViewModel : Screen, IShell
+    public class MainViewModel : Screen, IShell, IHandle<ObservableCollection<AttendanceRecordModel>>
     {
         #region
 
-        private const string _configFileSourceUri = "../../Files/ConfigInfo.xml";
+        private const string _configFileSourceUri = "Files/ConfigInfo.xml";
 
-        private const string _personnelRecordFileSourceUri = "../../Files/Personnel.xlsx";
+        private const string _personnelRecordFileSourceUri = "Files/Personnel.xlsx";
 
         private readonly string _attendanceDataUri = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/AttendanceData";
 
@@ -34,9 +35,13 @@ namespace AttendanceSystem.ViewModels
 
         private readonly string _personnelRecordFileUri = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/AttendanceData/Personnel.xlsx";
 
+        private readonly string _attendanceRecordFileUri = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/AttendanceData/{0}";
+
         #endregion
 
         #region 属性
+
+        public bool IsWriteRecords { get; set; }
 
         public int DefaultWorkHours { get; set; }
 
@@ -186,9 +191,12 @@ namespace AttendanceSystem.ViewModels
 
         public void ExportToExcel()
         {
-            CreateNewPersonnelFile();
+            if(IsWriteRecords)
+            {
+                CreateNewPersonnelFile();
+            }
 
-
+            CreateNewAttendanceFile();
         }
 
         public void OpenSettingWindow()
@@ -210,23 +218,25 @@ namespace AttendanceSystem.ViewModels
                         var defaultWorkHours = selectSingleNode.SelectSingleNode("DefaultWorkHours");
                         if(defaultWorkHours != null)
                         {
-                            defaultWorkHours.Attributes["DefaultWorkHours"].Value = DefaultWorkHours.ToString();
+                            defaultWorkHours.Attributes["Value"].Value = DefaultWorkHours.ToString();
                         }
                         var startWorkTime = selectSingleNode.SelectSingleNode("StartWorkTime");
                         if(startWorkTime != null)
                         {
-                            startWorkTime.Attributes["StartWorkTime"].Value = StartWorkTime;
+                            startWorkTime.Attributes["Value"].Value = StartWorkTime;
                         }
                         var defaultStartWorkTime = selectSingleNode.SelectSingleNode("DefaultStartWorkTime");
                         if(defaultStartWorkTime != null)
                         {
-                            defaultStartWorkTime.Attributes["DefaultStartWorkTime"].Value = DefaultStartWorkTime;
+                            defaultStartWorkTime.Attributes["Value"].Value = DefaultStartWorkTime;
                         }
                         var defaultEndWorkTime = selectSingleNode.SelectSingleNode("DefaultEndWorkTime");
                         if(defaultEndWorkTime != null)
                         {
-                            defaultEndWorkTime.Attributes["DefaultEndWorkTime"].Value = DefaultEndWorkTime;
+                            defaultEndWorkTime.Attributes["Value"].Value = DefaultEndWorkTime;
                         }
+
+                        xmlDocument.Save(_configFileUri);
                     }
                 }
             }
@@ -236,6 +246,22 @@ namespace AttendanceSystem.ViewModels
             }
         }
 
+        public void OnDataGridCellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+
+        }
+
+        public void AddLeave()
+        {
+            var addViewModel = IoC.Get<AddViewModel>();
+            addViewModel.AttendanceCollection = AttendanceCollection;
+            IoC.Get<IWindowManager>().ShowDialog(addViewModel);
+        }
+
+        public void Handle(ObservableCollection<AttendanceRecordModel> attendanceCollection)
+        {
+            AttendanceCollection = attendanceCollection;
+        }
 
         private void CreateNewPersonnelFile()
         {
@@ -266,6 +292,64 @@ namespace AttendanceSystem.ViewModels
                         row.CreateCell(5).SetCellValue(AttendanceCollection[i].RemainingAnnualLeave.ToString());
                         row.CreateCell(6).SetCellValue(AttendanceCollection[i].CumulativeSickLeave.ToString());
                         row.CreateCell(7).SetCellValue(AttendanceCollection[i].CumulativePrivateLeave.ToString());
+                    }
+
+                    workbook.Write(fs);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void CreateNewAttendanceFile()
+        {
+            try
+            {
+                using(var fs = new FileStream(string.Format(_attendanceRecordFileUri, DateTime.Now.ToString("yyyy-MM") + "月考勤表.xlsx"), FileMode.Create, FileAccess.Write))
+                {
+                    var workbook = new XSSFWorkbook();
+                    var sheet = workbook.CreateSheet("sheet1");
+                    var headerRow = sheet.CreateRow(0);
+                    headerRow.CreateCell(0).SetCellValue("序号");
+                    headerRow.CreateCell(1).SetCellValue("部门");
+                    headerRow.CreateCell(2).SetCellValue("姓名");
+                    headerRow.CreateCell(3).SetCellValue("病假（天）");
+                    headerRow.CreateCell(4).SetCellValue("累计病假");
+                    headerRow.CreateCell(5).SetCellValue("事假（天）");
+                    headerRow.CreateCell(6).SetCellValue("累计事假");
+                    headerRow.CreateCell(7).SetCellValue("病事假转换");
+                    headerRow.CreateCell(8).SetCellValue("可休年假");
+                    headerRow.CreateCell(9).SetCellValue("已休年假");
+                    headerRow.CreateCell(10).SetCellValue("剩余年假");
+                    headerRow.CreateCell(11).SetCellValue("其他假别");
+                    headerRow.CreateCell(12).SetCellValue("迟到（次）");
+                    headerRow.CreateCell(13).SetCellValue("旷工（天）");
+                    headerRow.CreateCell(14).SetCellValue("本月出勤工时（小时）");
+                    headerRow.CreateCell(15).SetCellValue("本月加班(小时）");
+                    headerRow.CreateCell(16).SetCellValue("备注");
+
+                    for(int i = 0; i < AttendanceCollection.Count; i++)
+                    {
+                        var row = sheet.CreateRow(i + 1);
+                        row.CreateCell(0).SetCellValue(AttendanceCollection[i].PersonnelIndex);
+                        row.CreateCell(1).SetCellValue(AttendanceCollection[i].DepartmentName);
+                        row.CreateCell(2).SetCellValue(AttendanceCollection[i].PersonnelName);
+                        row.CreateCell(3).SetCellValue(AttendanceCollection[i].SickLeave.ToString());
+                        row.CreateCell(4).SetCellValue(AttendanceCollection[i].CumulativeSickLeave.ToString());
+                        row.CreateCell(5).SetCellValue(AttendanceCollection[i].PrivateLeave.ToString());
+                        row.CreateCell(6).SetCellValue(AttendanceCollection[i].CumulativePrivateLeave.ToString());
+                        row.CreateCell(7).SetCellValue(AttendanceCollection[i].TransformLeave.ToString());
+                        row.CreateCell(8).SetCellValue(AttendanceCollection[i].FreeAnnualLeave.ToString());
+                        row.CreateCell(9).SetCellValue(AttendanceCollection[i].UsedAnnualLeave.ToString());
+                        row.CreateCell(10).SetCellValue(AttendanceCollection[i].RemainingAnnualLeave.ToString());
+                        row.CreateCell(11).SetCellValue(AttendanceCollection[i].LeaveName);
+                        row.CreateCell(12).SetCellValue(AttendanceCollection[i].LateTime.ToString());
+                        row.CreateCell(13).SetCellValue(AttendanceCollection[i].Absenteeism.ToString());
+                        row.CreateCell(14).SetCellValue(AttendanceCollection[i].AttendanceHour.ToString());
+                        row.CreateCell(15).SetCellValue(AttendanceCollection[i].OvertimeHour.ToString());
+                        row.CreateCell(16).SetCellValue(AttendanceCollection[i].Note);
                     }
 
                     workbook.Write(fs);
@@ -394,11 +478,11 @@ namespace AttendanceSystem.ViewModels
 
                     foreach(var record in group)
                     {
-                        if(record.ArriveTime.ToString() == "0001/1/1 0:00:00" && record.LeaveTime.ToString() != "0001/1/1 0:00:00")
+                        if((record.ArriveTime.ToString() == "0001/1/1 0:00:00" && record.LeaveTime.ToString() != "0001/1/1 0:00:00") || (record.ArriveTime.ToString() == "0001-01-01 0:00:00" && record.LeaveTime.ToString() != "0001-01-01 0:00:00"))
                         {
                             record.ArriveTime = Convert.ToDateTime(Convert.ToDateTime(DefaultStartWorkTime).ToShortTimeString());
                         }
-                        else if(record.ArriveTime.ToString() != "0001/1/1 0:00:00" && record.LeaveTime.ToString() == "0001/1/1 0:00:00")
+                        else if((record.ArriveTime.ToString() != "0001/1/1 0:00:00" && record.LeaveTime.ToString() == "0001/1/1 0:00:00") || (record.ArriveTime.ToString() != "0001-01-01 0:00:00" && record.LeaveTime.ToString() == "0001-01-01 0:00:00"))
                         {
                             record.LeaveTime = Convert.ToDateTime(Convert.ToDateTime(DefaultEndWorkTime).ToShortTimeString());
                         }
@@ -410,7 +494,7 @@ namespace AttendanceSystem.ViewModels
 
                         attendanceMinutes += record.LeaveTime.Subtract(record.ArriveTime).Duration().TotalMinutes;
                     }
-                    absenteeism += group.Count(r => r.ArriveTime.ToString() == "0001/1/1 0:00:00" && r.LeaveTime.ToString() == "0001/1/1 0:00:00");
+                    absenteeism += group.Count(r => (r.ArriveTime.ToString() == "0001/1/1 0:00:00" && r.LeaveTime.ToString() == "0001/1/1 0:00:00") || (r.ArriveTime.ToString() == "0001-01-01 0:00:00" && r.LeaveTime.ToString() == "0001-01-01 0:00:00"));
 
                     var attendanceHour = Math.Floor(attendanceMinutes / 60);
 
