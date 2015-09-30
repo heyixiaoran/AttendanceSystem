@@ -19,6 +19,22 @@
                       mc:Ignorable="d">
     <controls:MetroWindow.Resources>
         <ResourceDictionary>
+            <Ellipse x:Key="AppThemeMenuIcon"
+                     Width="16"
+                     Height="16"
+                     Fill="{Binding ColorBrush,
+                                    Mode=OneWay}"
+                     Stroke="{Binding BorderColorBrush,
+                                      Mode=OneWay}"
+                     StrokeThickness="1"
+                     x:Shared="False" />
+            <Ellipse x:Key="AccentMenuIcon"
+                     Width="16"
+                     Height="16"
+                     Fill="{Binding ColorBrush,
+                                    Mode=OneWay}"
+                     x:Shared="False" />
+
             <Style x:Key="AppThemeMenuItemStyle"
                    BasedOn="{StaticResource MetroMenuItem}"
                    TargetType="{x:Type MenuItem}">
@@ -39,8 +55,17 @@
 
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
-            <Button Content="Theme" />
-            <Button Content="Accent" />
+            <Menu Background="#00000000" >
+                <MenuItem Header="Theme"
+                          ItemContainerStyle="{StaticResource AppThemeMenuItemStyle}"
+                          ItemsSource="{Binding AppThemes,
+                                                Mode=OneWay}" Background="#00000000"/>
+
+                <MenuItem Header="Accent"
+                          ItemContainerStyle="{StaticResource AccentColorMenuItemStyle}"
+                          ItemsSource="{Binding AccentColors,
+                                                Mode=OneWay}" Background="#00000000"/>
+            </Menu>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
 
@@ -305,7 +330,8 @@
                               Height="26"
                               Content="写入记录"
                               IsChecked="{Binding IsWriteRecords,
-                                                  Mode=TwoWay}" />
+                                                  Mode=TwoWay}"
+                              ToolTip="选中后会把人员的假期存到Excel里，第二次选中即可" />
                 </Grid>
             </controls:Flyout>
         </controls:FlyoutsControl>

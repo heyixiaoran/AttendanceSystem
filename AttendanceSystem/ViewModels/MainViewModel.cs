@@ -1,23 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Xml;
-
+using AttendanceSystem.Commons;
 using AttendanceSystem.Models;
 using AttendanceSystem.Views;
 
 using Caliburn.Micro;
 
+using MahApps.Metro;
 using MahApps.Metro.Controls;
-using Microsoft.Win32;
-
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using Application = System.Windows.Application;
+using Brush = System.Windows.Media.Brush;
+using MenuItem = System.Windows.Controls.MenuItem;
+using MessageBox = System.Windows.MessageBox;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Screen = Caliburn.Micro.Screen;
 
 namespace AttendanceSystem.ViewModels
 {
@@ -59,16 +66,56 @@ namespace AttendanceSystem.ViewModels
 
         public ObservableCollection<LeaveTypeModel> LeaveCollection { get; set; }
 
+        public List<AccentColorMenuData> AccentColors { get; set; }
+
+        public List<AppThemeMenuData> AppThemes { get; set; }
+
         #endregion
 
         public MainViewModel()
         {
+            InitAccentColors();
+            InitAppThemes();
             CheckEnvironment();
             ReadConfigInfo();
             InitDepartmentCollection();
             InitLeaveCollection();
+            //InitialTray();
 
             AttendanceCollection = new ObservableCollection<AttendanceRecordModel>();
+        }
+
+        private NotifyIcon notifyIcon;
+
+        private void InitialTray()
+        {
+            this.notifyIcon = new NotifyIcon();
+            this.notifyIcon.BalloonTipText = "AttendanceSystem";
+            this.notifyIcon.ShowBalloonTip(2000);
+            this.notifyIcon.Text = "AttendanceSystem";
+            this.notifyIcon.Icon = Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
+            this.notifyIcon.Visible = true;
+
+        }
+
+        private void InitAppThemes()
+        {
+            AppThemes = ThemeManager.AppThemes
+                                    .Select(a => new AppThemeMenuData() { Name = a.Name, BorderColorBrush = a.Resources["BlackColorBrush"] as Brush, ColorBrush = a.Resources["WhiteColorBrush"] as Brush })
+                                    .ToList();
+        }
+
+        private void InitAccentColors()
+        {
+            AccentColors = ThemeManager.Accents
+                                       .Select(a => new AccentColorMenuData() { Name = a.Name, ColorBrush = a.Resources["AccentColorBrush"] as Brush })
+                                       .ToList();
+        }
+
+        public void ChangeTheme(object sender)
+        {
+            var menuItem = sender as MenuItem;
+
         }
 
         public void ImportExcel()
@@ -132,7 +179,11 @@ namespace AttendanceSystem.ViewModels
                                             case 1:
                                                 if(cell.CellType == CellType.String)
                                                 {
-                                                    record.Date = Convert.ToDateTime(cell.ToString());
+                                                    DateTime dateTimeX;
+                                                    if(DateTime.TryParse(cell.ToString(), out dateTimeX))
+                                                    {
+                                                        record.Date = Convert.ToDateTime(cell.ToString());
+                                                    }
                                                 }
                                                 else if(cell.CellType == CellType.Numeric)
                                                 {
@@ -140,9 +191,17 @@ namespace AttendanceSystem.ViewModels
                                                 }
                                                 break;
                                             case 2:
-                                                if(cell.CellType == CellType.String)
+                                                if(cell.CellType == CellType.String && cell.ToString() != "")
                                                 {
-                                                    record.ArriveTime = Convert.ToDateTime(Convert.ToDateTime(cell.ToString()).ToShortTimeString());
+                                                    DateTime dateTimeX;
+                                                    if(DateTime.TryParse(cell.ToString(), out dateTimeX))
+                                                    {
+                                                        record.ArriveTime = Convert.ToDateTime(Convert.ToDateTime(cell.ToString()).ToShortTimeString());
+                                                    }
+                                                    else
+                                                    {
+                                                        record.ArriveTime = Convert.ToDateTime(DefaultStartWorkTime);
+                                                    }
                                                 }
                                                 else if(cell.CellType == CellType.Numeric)
                                                 {
@@ -150,9 +209,17 @@ namespace AttendanceSystem.ViewModels
                                                 }
                                                 break;
                                             case 3:
-                                                if(cell.CellType == CellType.String)
+                                                if(cell.CellType == CellType.String && cell.ToString() != "")
                                                 {
-                                                    record.LeaveTime = Convert.ToDateTime(Convert.ToDateTime(cell.ToString()).ToShortTimeString());
+                                                    DateTime dateTimeX;
+                                                    if(DateTime.TryParse(cell.ToString(), out dateTimeX))
+                                                    {
+                                                        record.LeaveTime = Convert.ToDateTime(Convert.ToDateTime(cell.ToString()).ToShortTimeString());
+                                                    }
+                                                    else
+                                                    {
+                                                        record.ArriveTime = Convert.ToDateTime(DefaultEndWorkTime);
+                                                    }
                                                 }
                                                 else if(cell.CellType == CellType.Numeric)
                                                 {
@@ -223,17 +290,17 @@ namespace AttendanceSystem.ViewModels
                         var startWorkTime = selectSingleNode.SelectSingleNode("StartWorkTime");
                         if(startWorkTime != null)
                         {
-                            startWorkTime.Attributes["Value"].Value = StartWorkTime;
+                            startWorkTime.Attributes["Value"].Value = Convert.ToDateTime(StartWorkTime).TimeOfDay.ToString();
                         }
                         var defaultStartWorkTime = selectSingleNode.SelectSingleNode("DefaultStartWorkTime");
                         if(defaultStartWorkTime != null)
                         {
-                            defaultStartWorkTime.Attributes["Value"].Value = DefaultStartWorkTime;
+                            defaultStartWorkTime.Attributes["Value"].Value = Convert.ToDateTime(DefaultStartWorkTime).TimeOfDay.ToString();
                         }
                         var defaultEndWorkTime = selectSingleNode.SelectSingleNode("DefaultEndWorkTime");
                         if(defaultEndWorkTime != null)
                         {
-                            defaultEndWorkTime.Attributes["Value"].Value = DefaultEndWorkTime;
+                            defaultEndWorkTime.Attributes["Value"].Value = Convert.ToDateTime(DefaultEndWorkTime).TimeOfDay.ToString();
                         }
 
                         xmlDocument.Save(_configFileUri);
@@ -261,6 +328,16 @@ namespace AttendanceSystem.ViewModels
         public void Handle(ObservableCollection<AttendanceRecordModel> attendanceCollection)
         {
             AttendanceCollection = attendanceCollection;
+        }
+
+        public void ChangeTheme()
+        {
+            var theme = ThemeManager.DetectAppStyle(Application.Current);
+
+            // now set the Green accent and dark theme
+            ThemeManager.ChangeAppStyle(Application.Current,
+                                        ThemeManager.GetAccent("Green"),
+                                        ThemeManager.GetAppTheme("BaseDark"));
         }
 
         private void CreateNewPersonnelFile()
@@ -487,7 +564,7 @@ namespace AttendanceSystem.ViewModels
                             record.LeaveTime = Convert.ToDateTime(Convert.ToDateTime(DefaultEndWorkTime).ToShortTimeString());
                         }
 
-                        if(!(DateTime.Compare(record.ArriveTime, Convert.ToDateTime(StartWorkTime)) < 0))
+                        if(DateTime.Compare(record.ArriveTime, Convert.ToDateTime(StartWorkTime)) > 0)
                         {
                             lateCount += 1;
                         }

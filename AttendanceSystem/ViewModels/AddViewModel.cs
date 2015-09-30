@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using AttendanceSystem.Models;
 
 using Caliburn.Micro;
+
 using MahApps.Metro.Controls;
 
 namespace AttendanceSystem.ViewModels
@@ -30,6 +31,14 @@ namespace AttendanceSystem.ViewModels
         {
             try
             {
+                if(e.Column.DisplayIndex == 0)
+                {
+                    var dataGrid = sender as DataGrid;
+                    if(dataGrid != null)
+                    {
+                        var aa=  dataGrid.SelectedItem as AddRecordModel;
+                    }
+                }
                 //var dataGrid = sender as DataGrid;
                 //if(dataGrid != null)
                 //{
@@ -43,6 +52,11 @@ namespace AttendanceSystem.ViewModels
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        public void OnContentChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
 
         public void OnStartDateChanged(object sender, SelectionChangedEventArgs e)
@@ -119,7 +133,7 @@ namespace AttendanceSystem.ViewModels
             if(dataGrid != null)
             {
                 var record = dataGrid.SelectedItem as AddRecordModel;
-                if (record != null)
+                if(record != null)
                 {
                     LeaveRecordCollection.Remove(record);
                 }
